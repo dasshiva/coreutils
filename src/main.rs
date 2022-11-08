@@ -2,13 +2,15 @@ use std::env;
 use std::path::Path;
 use std::panic;
 
+mod copy;
+
 fn main() {
     panic::set_hook(Box::new(|info| {
         if let Some(s) = info.payload().downcast_ref::<&str>() {
             println!("{s:?}");
         }
         else {
-            println!("Panicked for unknown reason");
+            println!("{info}");
         }
     }));
     let args: Vec<String> = env::args().collect();
@@ -16,11 +18,14 @@ fn main() {
         Some(x) => {
             match x.to_str() {
                 Some(s) => s,
-                None => panic!("Unreachablw"),
+                None => panic!("Unreachable"),
             }
         }
         None => panic!("Unreachable!"), 
     };
 
-
+    match prog {
+        "cp" => copy::cp(&args),
+         _   => panic!("No such program {} ", prog),
+    }
 }
